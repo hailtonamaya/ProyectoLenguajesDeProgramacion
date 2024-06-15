@@ -46,6 +46,8 @@
 //
 //    return pila.top();
 //}
+
+
 int precedencia(char op) {
     switch (op) {
     case '+':
@@ -62,70 +64,66 @@ int precedencia(char op) {
     }
 }
 
-// Función para convertir una expresión infija a postfija y devolverla como string
 std::string infijaAPostfija(const std::string& infija) {
     std::string postfija;
     std::stack<char> pila;
-
-    // Mapa para almacenar la precedencia de los operadores
-    std::map<char, int> precedencias;
-    precedencias['+'] = 1;
-    precedencias['-'] = 1;
-    precedencias['*'] = 2;
-    precedencias['/'] = 2;
-    precedencias['('] = 0; // Paréntesis izquierdo tiene la menor precedencia
+    std::string numero;
 
     for (char ch : infija) {
         if (std::isspace(ch)) {
-            // Ignorar espacios en blanco
             continue;
         }
         else if (isdigit(ch)) {
-            // Manejar números enteros correctamente
-            if (!postfija.empty() && std::isdigit(postfija.back())) {
-                postfija.back() = ch; // Continuar construyendo el número
+            numero += ch;
+        }
+        else {
+            if (!numero.empty()) {
+                if (!postfija.empty()) {
+                    postfija += ", ";
+                }
+                postfija += numero;
+                numero.clear();
+            }
+
+            if (ch == '(') {
+                pila.push(ch);
+            }
+            else if (ch == ')') {
+                while (!pila.empty() && pila.top() != '(') {
+                    if (!postfija.empty()) {
+                        postfija += ", ";
+                    }
+                    postfija += pila.top();
+                    pila.pop();
+                }
+                pila.pop(); 
             }
             else {
-                if (!postfija.empty()) {
-                    postfija += ", "; // Separación entre elementos
+                while (!pila.empty() && precedencia(pila.top()) >= precedencia(ch)) {
+                    if (!postfija.empty()) {
+                        postfija += ", ";
+                    }
+                    postfija += pila.top();
+                    pila.pop();
                 }
-                postfija += ch; // Inicio de un nuevo número
+                pila.push(ch);
             }
-        }
-        else if (ch == '(') {
-            // Si es un paréntesis izquierdo, agregarlo a la pila
-            pila.push(ch);
-        }
-        else if (ch == ')') {
-            // Si es un paréntesis derecho, desapilar operadores hasta encontrar el paréntesis izquierdo correspondiente
-            while (!pila.empty() && pila.top() != '(') {
-                postfija += ", ";
-                postfija += pila.top();
-                pila.pop();
-            }
-            pila.pop(); // Sacar el paréntesis izquierdo de la pila
-        }
-        else { // Operador encontrado
-            while (!pila.empty() && precedencias[pila.top()] >= precedencias[ch]) {
-                postfija += ", ";
-                postfija += pila.top();
-                pila.pop();
-            }
-            pila.push(ch);
-            postfija += ", "; // Separación después del operador
         }
     }
 
-    // Vaciar la pila al final de la expresión
+    if (!numero.empty()) {
+        if (!postfija.empty()) {
+            postfija += ", ";
+        }
+        postfija += numero;
+    }
+
     while (!pila.empty()) {
-        postfija += ", ";
+        if (!postfija.empty()) {
+            postfija += ", ";
+        }
         postfija += pila.top();
         pila.pop();
-    }
-
-    // Eliminar el último espacio si existe
-    if (!postfija.empty()) {
-        postfija.pop_back();
     }
 
     return postfija;
