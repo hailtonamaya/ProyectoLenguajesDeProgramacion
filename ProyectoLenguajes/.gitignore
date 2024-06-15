@@ -7,7 +7,7 @@
 *.o
 *.obj
 
-x64/
+/x64/
 
 # Precompiled Headers
 *.gch
