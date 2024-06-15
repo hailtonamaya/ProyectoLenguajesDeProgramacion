@@ -8,5 +8,4 @@ int main() {
     cout << "Resultado: " << resultado << endl;
 
     return 0;
-    //aaaa
 }
