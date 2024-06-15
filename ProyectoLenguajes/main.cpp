@@ -1,7 +1,7 @@
 #include "Evaluador.h"
 
 int main() {
-    string expresion = "10 + (1 + 2)";
+    string expresion = "10.5 + (1 + 2)";
     cout << "Expresion: " << expresion << endl;
 
     string resultado = infijaAPostfija(expresion);

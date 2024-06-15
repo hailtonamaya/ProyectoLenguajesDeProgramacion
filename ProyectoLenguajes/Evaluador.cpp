@@ -1,42 +1,8 @@
 #include "Evaluador.h"
-
-bool esOperador(char c) {
-    return c == '+' || c == '-' || c == '*' || c == '/';
-}
-
-int evaluarPostfija(const string& expresion) {
-    stack<int> pila;
-    stringstream ss(expresion);
-    string token;
-
-    while (ss >> token) {
-        if (isdigit(token[0])) {
-            pila.push(stoi(token));
-        }
-        else if (esOperador(token[0])) {
-            int operand2 = pila.top(); pila.pop();
-            int operand1 = pila.top(); pila.pop();
-
-            switch (token[0]) {
-            case '+':
-                pila.push(operand1 + operand2);
-                break;
-            case '-':
-                pila.push(operand1 - operand2);
-                break;
-            case '*':
-                pila.push(operand1 * operand2);
-                break;
-            case '/':
-                pila.push(operand1 / operand2);
-                break;
-            }
-        }
-    }
-
-    return pila.top();
-}
-
+#include <stack>
+#include <sstream>
+#include <string>
+#include <cctype>
 
 int precedencia(char op) {
     switch (op) {
@@ -54,16 +20,20 @@ int precedencia(char op) {
     }
 }
 
-std::string infijaAPostfija(const std::string& infija) {
-    std::string postfija;
-    std::stack<char> pila;
-    std::string numero;
+bool esOperador(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/';
+}
+
+string infijaAPostfija(const string& infija) {
+    string postfija;
+    stack<char> pila;
+    string numero;
 
     for (char ch : infija) {
         if (std::isspace(ch)) {
             continue;
         }
-        else if (isdigit(ch)) {
+        else if (isdigit(ch) || ch == '.') {
             numero += ch;
         }
         else {
@@ -75,10 +45,10 @@ std::string infijaAPostfija(const std::string& infija) {
                 numero.clear();
             }
 
-            if (ch == '(') {
+            if (ch == '(') {               
                 pila.push(ch);
             }
-            else if (ch == ')') {
+            else if (ch == ')') {            
                 while (!pila.empty() && pila.top() != '(') {
                     if (!postfija.empty()) {
                         postfija += ", ";
@@ -88,7 +58,7 @@ std::string infijaAPostfija(const std::string& infija) {
                 }
                 pila.pop(); 
             }
-            else {
+            else { 
                 while (!pila.empty() && precedencia(pila.top()) >= precedencia(ch)) {
                     if (!postfija.empty()) {
                         postfija += ", ";
@@ -117,4 +87,40 @@ std::string infijaAPostfija(const std::string& infija) {
     }
 
     return postfija;
+}
+
+double evaluarPostfija(const std::string& expresion) {
+    std::stack<double> pila;
+    std::stringstream ss(expresion);
+    std::string token;
+
+    while (getline(ss, token, ',')) {
+        token.erase(0, token.find_first_not_of(" "));
+        token.erase(token.find_last_not_of(" ") + 1);
+
+        if (!token.empty() && (isdigit(token[0]) || token[0] == '.' || (token[0] == '-' && token.length() > 1))) {
+            pila.push(std::stod(token));
+        }
+        else if (!token.empty() && esOperador(token[0])) {
+            double operand2 = pila.top(); pila.pop();
+            double operand1 = pila.top(); pila.pop();
+
+            switch (token[0]) {
+            case '+':
+                pila.push(operand1 + operand2);
+                break;
+            case '-':
+                pila.push(operand1 - operand2);
+                break;
+            case '*':
+                pila.push(operand1 * operand2);
+                break;
+            case '/':
+                pila.push(operand1 / operand2);
+                break;
+            }
+        }
+    }
+
+    return pila.top();
 }
