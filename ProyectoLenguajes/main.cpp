@@ -6,6 +6,7 @@ int main() {
 
     string resultado = infijaAPostfija(expresion);
     cout << "Resultado: " << resultado << endl;
-    
+
+    cout <<"evaluar posfija: " << evaluarPostfija(resultado) << endl;
     return 0;
 }
