@@ -46,7 +46,6 @@
 //
 //    return pila.top();
 //}
-
 int precedencia(char op) {
     switch (op) {
     case '+':
@@ -65,11 +64,16 @@ int precedencia(char op) {
 
 // Función para convertir una expresión infija a postfija y devolverla como string
 std::string infijaAPostfija(const std::string& infija) {
-    std::stringstream postfija;
+    std::string postfija;
     std::stack<char> pila;
 
-    bool num_entero = false; // Bandera para verificar si estamos construyendo un número entero
-    bool ultimo_fue_digito = false; // Bandera para verificar si el último caracter fue un dígito
+    // Mapa para almacenar la precedencia de los operadores
+    std::map<char, int> precedencias;
+    precedencias['+'] = 1;
+    precedencias['-'] = 1;
+    precedencias['*'] = 2;
+    precedencias['/'] = 2;
+    precedencias['('] = 0; // Paréntesis izquierdo tiene la menor precedencia
 
     for (char ch : infija) {
         if (std::isspace(ch)) {
@@ -77,61 +81,52 @@ std::string infijaAPostfija(const std::string& infija) {
             continue;
         }
         else if (isdigit(ch)) {
-            if (!num_entero) {
-                // Inicio de un nuevo número entero
-                num_entero = true;
-                if (ultimo_fue_digito) {
-                    postfija << ", "; // Separación entre números enteros consecutivos
-                }
-            }
-            postfija << ch; // Agregar dígito al número entero actual
-            ultimo_fue_digito = true;
-        }
-        else {
-            // Si encontramos un operador o paréntesis, finalizamos el número entero actual
-            if (num_entero) {
-                postfija << ", "; // Separación entre número entero y operador
-                num_entero = false;
-                ultimo_fue_digito = false;
-            }
-
-            if (ch == '(') {
-                pila.push(ch);
-            }
-            else if (ch == ')') {
-                while (!pila.empty() && pila.top() != '(') {
-                    postfija << pila.top() << ", ";
-                    pila.pop();
-                }
-                pila.pop(); // Eliminar '(' de la pila
+            // Manejar números enteros correctamente
+            if (!postfija.empty() && std::isdigit(postfija.back())) {
+                postfija.back() = ch; // Continuar construyendo el número
             }
             else {
-                while (!pila.empty() && pila.top() != '(' && precedencia(pila.top()) >= precedencia(ch)) {
-                    postfija << pila.top() << ", ";
-                    pila.pop();
+                if (!postfija.empty()) {
+                    postfija += ", "; // Separación entre elementos
                 }
-                pila.push(ch);
+                postfija += ch; // Inicio de un nuevo número
             }
-
-            ultimo_fue_digito = false;
+        }
+        else if (ch == '(') {
+            // Si es un paréntesis izquierdo, agregarlo a la pila
+            pila.push(ch);
+        }
+        else if (ch == ')') {
+            // Si es un paréntesis derecho, desapilar operadores hasta encontrar el paréntesis izquierdo correspondiente
+            while (!pila.empty() && pila.top() != '(') {
+                postfija += ", ";
+                postfija += pila.top();
+                pila.pop();
+            }
+            pila.pop(); // Sacar el paréntesis izquierdo de la pila
+        }
+        else { // Operador encontrado
+            while (!pila.empty() && precedencias[pila.top()] >= precedencias[ch]) {
+                postfija += ", ";
+                postfija += pila.top();
+                pila.pop();
+            }
+            pila.push(ch);
+            postfija += ", "; // Separación después del operador
         }
     }
 
-    // Finalizar cualquier número entero que esté en progreso
-    if (num_entero) {
-        postfija << ", "; // Separación al final de un número entero
-    }
-
+    // Vaciar la pila al final de la expresión
     while (!pila.empty()) {
-        postfija << pila.top() << ", ";
+        postfija += ", ";
+        postfija += pila.top();
         pila.pop();
     }
 
-    // Convertir stringstream a string y eliminar la última coma y espacio si existe
-    std::string resultado = postfija.str();
-    if (!resultado.empty() && resultado.substr(resultado.size() - 2) == ", ") {
-        resultado = resultado.substr(0, resultado.size() - 2);
+    // Eliminar el último espacio si existe
+    if (!postfija.empty()) {
+        postfija.pop_back();
     }
 
-    return resultado;
+    return postfija;
 }

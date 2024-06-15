@@ -3,6 +3,7 @@
 #include <stack>
 #include <sstream>
 #include <string>
+#include <map>
 #include <cctype>
 using namespace std;
 
