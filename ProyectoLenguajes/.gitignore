@@ -8,6 +8,7 @@
 *.obj
 
 /x64/
+/.vs/
 
 # Precompiled Headers
 *.gch
