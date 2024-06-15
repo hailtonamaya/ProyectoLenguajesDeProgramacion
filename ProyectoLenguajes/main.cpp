@@ -1,11 +1,11 @@
 #include "Evaluador.h"
 
 int main() {
-    string expresion = "3 4 + 5 *";
-    cout << "Expresion postfija: " << expresion << endl;
+    string expresion = "10 + (1 + 2)";
+    cout << "Expresion: " << expresion << endl;
 
-    int resultado = evaluarPostfija(expresion);
+    string resultado = infijaAPostfija(expresion);
     cout << "Resultado: " << resultado << endl;
-    //a
+    
     return 0;
 }
