@@ -13,6 +13,5 @@ int main() {
     } else {
         std::cout << "Expresion infija no se pudo evaluar" << std::endl;
     }
-
     return 0;
 }

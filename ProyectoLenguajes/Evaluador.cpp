@@ -99,21 +99,20 @@ double evaluarPostfija(const std::string& expresion) {
         } else if (!token.empty() && esOperador(token[0])) {
             double operand2 = pila.top(); pila.pop();
             double operand1 = pila.top(); pila.pop();
-
             switch (token[0]) {
-            case '+':
-                pila.push(operand1 + operand2);
-                break;
-            case '-':
-                pila.push(operand1 - operand2);
-                break;
-            case '*':
-                pila.push(operand1 * operand2);
-                break;
-            case '/':
-                pila.push(operand1 / operand2);
-                break;
-            }
+                case '+':
+                    pila.push(operand1 + operand2);
+                    break;
+                case '-':
+                    pila.push(operand1 - operand2);
+                    break;
+                case '*':
+                    pila.push(operand1 * operand2);
+                    break;
+                case '/':
+                    pila.push(operand1 / operand2);
+                    break;
+             }
         }
     }
     return pila.top();
