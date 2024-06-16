@@ -5,9 +5,9 @@
 #include <string>
 #include <map>
 #include <cctype>
-using namespace std;
 
 bool esOperador(char c);
 int precedencia(char c);
 double evaluarPostfija(const std::string& expresion);
-string infijaAPostfija(const std::string& infija);
+std::string infijaAPostfija(const std::string& infija);
+bool evaluarInfija(const std::string& expresion);
