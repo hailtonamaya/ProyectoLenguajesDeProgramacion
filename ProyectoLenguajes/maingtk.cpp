@@ -4,14 +4,17 @@
 #include <iostream>
 #include <string>
 
+#include <fstream>
+#include <sstream>
+
 
 
 GtkWidget *text_view;
 GtkWidget *input_entry;
 GtkWidget *button;
 
-GtkWidget *constant_input_entry;
-GtkWidget *constant_button;
+GtkWidget *variables_input_entry;
+GtkWidget *variables_button;
 
 
 
@@ -34,9 +37,21 @@ GtkWidget *panel1, *panel2, *panel3;
 
 GtkWidget *vbox;
 GtkWidget *subpanel1, *subpanel2;
-GtkWidget *const_subpanel1, *const_subpanel2;
+GtkWidget *variables_subpanel1, *variables_subpanel2;
 
 
+std::string read_file_content(const std::string& file_path) {
+    std::ifstream file(file_path);
+    std::stringstream buffer;
+
+    if (file) {
+        buffer << file.rdbuf();
+        return buffer.str();
+    } else {
+        std::cerr << "Error al abrir el archivo: " << file_path << std::endl;
+        return "";
+    }
+}
 
 
 static void on_button_clicked(GtkButton *button, gpointer user_data) {
@@ -78,6 +93,12 @@ void handle_expression_button(GtkWidget *widget, gpointer data) {
 }
 
 int main(int argc, char *argv[]) {
+
+
+std::string file_content = read_file_content("constantes");
+const gchar* label_text = file_content.c_str();
+
+
     GtkWidget *window;
     GtkWidget *container;
     GtkWidget *grid;
@@ -99,19 +120,19 @@ int main(int argc, char *argv[]) {
     gtk_container_add(GTK_CONTAINER(window), hbox);
 
     // Crear los tres paneles
-    panel1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    panel1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     panel2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    panel3 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    panel3 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
 
     GdkRGBA red = {1, 0, 0, 1};
     GdkRGBA green = {0, 1, 0, 1};
-    GdkRGBA blue = {0, 0, 1, 1};
-    GdkRGBA yellow = {1, 1, 0, 1};
+    GdkRGBA blue = {0, 0, 1, 0.2};
+    GdkRGBA yellow = {1, 1, 0, 0.4};
     GdkRGBA purple = {0.5, 0, 0.5, 0.2};
 
-    gtk_widget_override_background_color(panel1, GTK_STATE_FLAG_NORMAL, &red);
-    gtk_widget_override_background_color(panel2, GTK_STATE_FLAG_NORMAL, &green);
+    gtk_widget_override_background_color(panel1, GTK_STATE_FLAG_NORMAL, &blue);
+    gtk_widget_override_background_color(panel2, GTK_STATE_FLAG_NORMAL, NULL );
     gtk_widget_override_background_color(panel3, GTK_STATE_FLAG_NORMAL, &yellow);
 
     // Añadir los paneles al contenedor horizontal
@@ -126,23 +147,23 @@ int main(int argc, char *argv[]) {
 
 
 
-    const_subpanel1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    const_subpanel2= gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
+    variables_subpanel1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    variables_subpanel2= gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
 
 
 
     // Asignar colores diferentes a los subpaneles
-    gtk_widget_override_background_color(subpanel1, GTK_STATE_FLAG_NORMAL, &yellow);
+    gtk_widget_override_background_color(subpanel1, GTK_STATE_FLAG_NORMAL, NULL);
     gtk_widget_override_background_color(subpanel2, GTK_STATE_FLAG_NORMAL, &purple);
 
 
-    gtk_box_pack_start(GTK_BOX(panel2), subpanel1, TRUE, TRUE, 10);
-    gtk_box_pack_start(GTK_BOX(panel2), subpanel2, TRUE, TRUE, 1);
+    gtk_box_pack_start(GTK_BOX(panel2), subpanel1, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(panel2), subpanel2, TRUE, TRUE, 0);
 
 
 
-    gtk_box_pack_start(GTK_BOX(panel1), const_subpanel1, TRUE, TRUE, 10);
-    gtk_box_pack_start(GTK_BOX(panel1), const_subpanel2, TRUE, TRUE, 1);
+    gtk_box_pack_start(GTK_BOX(panel3), variables_subpanel1, TRUE, TRUE, 10);
+    gtk_box_pack_start(GTK_BOX(panel3), variables_subpanel2, TRUE, TRUE, 1);
      // Crear un Label para mostrar el historial de expresiones
    // history_label = gtk_label_new("Historial: ");
    // gtk_grid_attach(GTK_GRID(grid), history_label, 0, 2, 1, 1);
@@ -196,15 +217,15 @@ int main(int argc, char *argv[]) {
 
 
     // Añadir el GtkScrolledWindow al tercer panel
-    gtk_box_pack_start(GTK_BOX(panel3), variables_scrolled_window, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(variables_subpanel1), variables_scrolled_window, TRUE, TRUE, 0);
 
     //==================================================================================
 
 
 
       //==============================PANEL 1===================================================
-
-    constant_label = gtk_label_new("Constantes: " );
+//g_strconcat(entry_text, "\n", current_text, NULL);
+    constant_label = gtk_label_new( g_strconcat("Constantes: " , "\n", label_text, NULL));
     gtk_label_set_xalign(GTK_LABEL(constant_label), 0.0); // Alinear texto a la izquierda
     gtk_label_set_yalign(GTK_LABEL(constant_label), 0.0); // Alinear texto en la parte superior
     gtk_label_set_line_wrap(GTK_LABEL(constant_label), TRUE); // Habilitar el salto de línea
@@ -221,20 +242,20 @@ int main(int argc, char *argv[]) {
 
 
     // Añadir el GtkScrolledWindow al tercer panel
-    gtk_box_pack_start(GTK_BOX(const_subpanel1), constant_scrolled_window, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(panel1), constant_scrolled_window, TRUE, TRUE, 0);
 
     //==================================================================================
 
-      constant_input_entry= gtk_entry_new();
+      variables_input_entry= gtk_entry_new();
 
-      gtk_entry_set_placeholder_text(GTK_ENTRY(constant_input_entry), "Escribe la constante aquí...");
-      gtk_box_pack_start(GTK_BOX(const_subpanel2), constant_input_entry, TRUE, TRUE, 0);
-
-
+      gtk_entry_set_placeholder_text(GTK_ENTRY(variables_input_entry), "Escribe la variable aquí...");
+      gtk_box_pack_start(GTK_BOX(variables_subpanel2), variables_input_entry, TRUE, TRUE, 0);
 
 
-    constant_button = gtk_button_new_with_label("Agregar Constante");
-    gtk_box_pack_start(GTK_BOX(const_subpanel2), constant_button, TRUE, TRUE, 0);
+
+
+    variables_button = gtk_button_new_with_label("Agregar Variable");
+    gtk_box_pack_start(GTK_BOX(variables_subpanel2), variables_button, TRUE, TRUE, 0);
 
 
     input_entry = gtk_entry_new();
