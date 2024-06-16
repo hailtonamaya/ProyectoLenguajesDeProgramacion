@@ -3146,9 +3146,12 @@
 	<string>
 	<cctype>
 
-1718305058 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/maingtk.cpp
+1718469811 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/maingtk.cpp
 	<stdlib.h>
 	<gtk/gtk.h>
+	"Evaluador.h"
+	<iostream>
+	<string>
 	<gtk/gtk.h>
 
 1718119732 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/test.cpp

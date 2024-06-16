@@ -36,7 +36,10 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="Evaluador.cpp" />
+		<Unit filename="Evaluador.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="maingtk.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

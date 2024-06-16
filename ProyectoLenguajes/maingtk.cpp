@@ -1,19 +1,27 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
+#include "Evaluador.h"
+#include <iostream>
+#include <string>
+
 
 
 GtkWidget *text_view;
 GtkWidget *input_entry;
+GtkWidget *button;
+
+GtkWidget *constant_input_entry;
+GtkWidget *constant_button;
 
 
-//SOLO TEXTO
+
 GtkWidget *constant_label;
 GtkWidget *history_label;
 GtkWidget *variables_label;
 
 
 
-//MUCHO TEXTO
+
 GtkWidget *scrolled_window;
 GtkWidget *variables_scrolled_window;
 GtkWidget *constant_scrolled_window;
@@ -22,8 +30,44 @@ GtkWidget *hbox;
 
 GtkWidget *panel1, *panel2, *panel3;
 
+
+
  GtkWidget *vbox;
     GtkWidget *subpanel1, *subpanel2;
+
+     GtkWidget *const_subpanel1, *const_subpanel2;
+
+
+
+
+static void on_button_clicked(GtkButton *button, gpointer user_data) {
+
+      GtkWidget **widgets = (GtkWidget **)user_data;
+    GtkEntry *entry = GTK_ENTRY(widgets[0]);
+    GtkLabel *label = GTK_LABEL(widgets[1]);
+
+    const gchar *entry_text = gtk_entry_get_text(entry); // Obtener el texto del entry
+    const gchar *current_text = gtk_label_get_text(label);
+    //GtkLabel *label = GTK_LABEL(user_data);
+    //gtk_label_set_text(label, "Nuevo texto agregado");
+  // const gchar *entry_text = gtk_entry_get_text(read_label);
+    //  GtkLabel *label = GTK_LABEL(write_label);
+ std::string entry_string(current_text);
+
+
+ int resultado = evaluarPostfija(entry_string);
+    cout << "Resultado: " << resultado << endl;
+//    const gchar *current_text = gtk_label_get_text(label);
+
+
+
+
+   gchar *new_text = g_strconcat(entry_text, "\n", current_text, NULL); // Concatenar nuevo texto con salto de línea
+    gtk_label_set_text(label, new_text); // Establecer el nuevo texto en el label
+    g_free(new_text); //Toca liberar la memoria manual porque no le saben el analisis lexico
+}
+
+
 
 
 void show_text(const gchar *text) {
@@ -45,7 +89,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *window;
     GtkWidget *container;
     GtkWidget *grid;
-    GtkWidget *button;
+
 
     gtk_init(&argc, &argv);
 
@@ -63,16 +107,16 @@ int main(int argc, char *argv[]) {
     gtk_container_add(GTK_CONTAINER(window), hbox);
 
     // Crear los tres paneles
-    panel1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    panel1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     panel2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     panel3 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
-    // Asignar colores diferentes a cada panel
+
     GdkRGBA red = {1, 0, 0, 1};
     GdkRGBA green = {0, 1, 0, 1};
     GdkRGBA blue = {0, 0, 1, 1};
-    GdkRGBA yellow = {1, 1, 0, 1}; // Amarillo
-    GdkRGBA purple = {0.5, 0, 0.5, 0.2}; // Púrpura
+    GdkRGBA yellow = {1, 1, 0, 1};
+    GdkRGBA purple = {0.5, 0, 0.5, 0.2};
 
     gtk_widget_override_background_color(panel1, GTK_STATE_FLAG_NORMAL, &red);
     gtk_widget_override_background_color(panel2, GTK_STATE_FLAG_NORMAL, &green);
@@ -88,16 +132,25 @@ int main(int argc, char *argv[]) {
     subpanel1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     subpanel2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
+
+
+    const_subpanel1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    const_subpanel2= gtk_box_new( GTK_ORIENTATION_VERTICAL, 0);
+
+
+
     // Asignar colores diferentes a los subpaneles
     gtk_widget_override_background_color(subpanel1, GTK_STATE_FLAG_NORMAL, &yellow);
     gtk_widget_override_background_color(subpanel2, GTK_STATE_FLAG_NORMAL, &purple);
 
 
-    gtk_box_pack_start(GTK_BOX(panel2), subpanel1, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(panel2), subpanel2, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(panel2), subpanel1, TRUE, TRUE, 10);
+    gtk_box_pack_start(GTK_BOX(panel2), subpanel2, TRUE, TRUE, 1);
 
 
 
+    gtk_box_pack_start(GTK_BOX(panel1), const_subpanel1, TRUE, TRUE, 10);
+    gtk_box_pack_start(GTK_BOX(panel1), const_subpanel2, TRUE, TRUE, 1);
      // Crear un Label para mostrar el historial de expresiones
    // history_label = gtk_label_new("Historial: ");
    // gtk_grid_attach(GTK_GRID(grid), history_label, 0, 2, 1, 1);
@@ -176,73 +229,60 @@ int main(int argc, char *argv[]) {
 
 
     // Añadir el GtkScrolledWindow al tercer panel
-    gtk_box_pack_start(GTK_BOX(panel1), constant_scrolled_window, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(const_subpanel1), constant_scrolled_window, TRUE, TRUE, 0);
 
     //==================================================================================
 
 
 
+
+      constant_input_entry= gtk_entry_new();
+
+      gtk_entry_set_placeholder_text(GTK_ENTRY(constant_input_entry), "Escribe la constante aquí...");
+  gtk_box_pack_start(GTK_BOX(const_subpanel2), constant_input_entry, TRUE, TRUE, 0);
+
+
+
+
+ constant_button = gtk_button_new_with_label("Agregar Constante");
+    gtk_box_pack_start(GTK_BOX(const_subpanel2), constant_button, TRUE, TRUE, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
 input_entry = gtk_entry_new();
+gtk_entry_set_placeholder_text(GTK_ENTRY(input_entry), "Escribe la expresion aquí...");
    // gtk_grid_attach(GTK_GRID(grid), input_entry, 0, 1, 1, 1);
 
 
   gtk_box_pack_start(GTK_BOX(subpanel1), input_entry, TRUE, TRUE, 0);
 
 
-   button = gtk_button_new_with_label("Click Me");
+
+
+
+
+
+
+   button = gtk_button_new_with_label("Enviar");
     gtk_box_pack_start(GTK_BOX(subpanel1), button, TRUE, TRUE, 0);
 
+    GtkWidget *widgets[2] = { input_entry, history_label };
+
+  //   g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), history_label, input_entry);
+  g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), widgets);
+
+
     gtk_widget_show_all(window);
-    //========================================================================
-
-    // Crear un contenedor para organizar los widgets
-  //  container = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-   // gtk_container_add(GTK_CONTAINER(panel1), container);
-
-    // Crear una rejilla para dividir la ventana en secciones
-   // grid = gtk_grid_new();
-    //gtk_box_pack_start(GTK_BOX(container), grid, TRUE, TRUE, 0);
-
-    // Crear un TextView para mostrar el texto del archivo
-  //  text_view = gtk_text_view_new();
-   // gtk_text_view_set_editable(GTK_TEXT_VIEW(text_view), FALSE);
-    //gtk_grid_attach(GTK_GRID(grid), text_view, 0, 0, 1, 1);
-
-    // Crear un Entry para ingresar expresiones
-    //input_entry = gtk_entry_new();
-   // gtk_grid_attach(GTK_GRID(grid), input_entry, 0, 1, 1, 1);
-
-    // Crear un Label para mostrar el historial de expresiones
-   // history_label = gtk_label_new("Historial: ");
-   // gtk_grid_attach(GTK_GRID(grid), history_label, 0, 2, 1, 1);
-
-    // Crear un botón para agregar la expresión al historial
-   // button = gtk_button_new_with_label("Agregar expresión");
-  //  g_signal_connect(button, "clicked", G_CALLBACK(handle_expression_button), NULL);
-  //  gtk_grid_attach(GTK_GRID(grid), button, 1, 1, 1, 1);
-
-    // Crear un Label para mostrar las variables generadas
-    //variables_label = gtk_label_new("Variables:");
-   // gtk_grid_attach(GTK_GRID(grid), variables_label, 0, 3, 1, 1);
-
-    //    GtkCssProvider *provider = gtk_css_provider_new();
-    //gtk_css_provider_load_from_data(provider,
-    //    "#text_view { background-color: red; }"
-    //    "#input_entry { background-color: green; }"
-    //    "#history_label { background-color: blue; }"
-     //   "#variables_label { background-color: yellow; }",
-     //   -1, NULL);
-
-
-
-
-
-
-
-
-
-          //========================================================================
-
 
 
     // Mostrar todos los widgets
@@ -252,56 +292,3 @@ input_entry = gtk_entry_new();
 
     return EXIT_SUCCESS;
 }
-
-
-
-/*
-#include <gtk/gtk.h>
-
-static void activate(GtkApplication *app, gpointer user_data) {
-    GtkWidget *window;
-    GtkWidget *hbox;
-    GtkWidget *panel1, *panel2, *panel3;
-
-    window = gtk_application_window_new(app);
-    gtk_window_set_title(GTK_WINDOW(window), "Three Panels Example");
-    gtk_window_set_default_size(GTK_WINDOW(window), 600, 400);
-
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(window), hbox);
-
-    // Crear los tres paneles
-    panel1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    panel2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    panel3 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-
-    // Asignar colores diferentes a cada panel
-    GdkRGBA red = {1, 0, 0, 1};
-    GdkRGBA green = {0, 1, 0, 1};
-    GdkRGBA blue = {0, 0, 1, 1};
-
-    gtk_widget_override_background_color(panel1, GTK_STATE_FLAG_NORMAL, &red);
-    gtk_widget_override_background_color(panel2, GTK_STATE_FLAG_NORMAL, &green);
-    gtk_widget_override_background_color(panel3, GTK_STATE_FLAG_NORMAL, &blue);
-
-    // Añadir los paneles al contenedor horizontal
-    gtk_box_pack_start(GTK_BOX(hbox), panel1, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), panel2, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), panel3, TRUE, TRUE, 0);
-
-    gtk_widget_show_all(window);
-}
-
-int main(int argc, char **argv) {
-    GtkApplication *app;
-    int status;
-
-    app = gtk_application_new("com.example.threepanels", G_APPLICATION_FLAGS_NONE);
-    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
-    status = g_application_run(G_APPLICATION(app), argc, argv);
-    g_object_unref(app);
-
-    return status;
-}
-
-*/
