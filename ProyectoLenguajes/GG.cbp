@@ -38,6 +38,7 @@
 		</Compiler>
 		<Unit filename="Evaluador.cpp" />
 		<Unit filename="Evaluador.h" />
+		<Unit filename="constantes" />
 		<Unit filename="main.cpp" />
 		<Unit filename="maingtk.cpp" />
 		<Extensions />

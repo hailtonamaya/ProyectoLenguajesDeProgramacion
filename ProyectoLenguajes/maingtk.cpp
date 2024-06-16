@@ -32,39 +32,31 @@ GtkWidget *panel1, *panel2, *panel3;
 
 
 
- GtkWidget *vbox;
-    GtkWidget *subpanel1, *subpanel2;
-
-     GtkWidget *const_subpanel1, *const_subpanel2;
+GtkWidget *vbox;
+GtkWidget *subpanel1, *subpanel2;
+GtkWidget *const_subpanel1, *const_subpanel2;
 
 
 
 
 static void on_button_clicked(GtkButton *button, gpointer user_data) {
 
-      GtkWidget **widgets = (GtkWidget **)user_data;
+    GtkWidget **widgets = (GtkWidget **)user_data;
     GtkEntry *entry = GTK_ENTRY(widgets[0]);
     GtkLabel *label = GTK_LABEL(widgets[1]);
 
     const gchar *entry_text = gtk_entry_get_text(entry); // Obtener el texto del entry
     const gchar *current_text = gtk_label_get_text(label);
-    //GtkLabel *label = GTK_LABEL(user_data);
-    //gtk_label_set_text(label, "Nuevo texto agregado");
-  // const gchar *entry_text = gtk_entry_get_text(read_label);
-    //  GtkLabel *label = GTK_LABEL(write_label);
- std::string entry_string(current_text);
+
+    std::string entry_string(current_text);
 
 
- int resultado = evaluarPostfija(entry_string);
+    int resultado = evaluarPostfija(entry_string);
     cout << "Resultado: " << resultado << endl;
-//    const gchar *current_text = gtk_label_get_text(label);
 
-
-
-
-   gchar *new_text = g_strconcat(entry_text, "\n", current_text, NULL); // Concatenar nuevo texto con salto de línea
-    gtk_label_set_text(label, new_text); // Establecer el nuevo texto en el label
-    g_free(new_text); //Toca liberar la memoria manual porque no le saben el analisis lexico
+    gchar *new_text = g_strconcat(entry_text, "\n", current_text, NULL);
+    gtk_label_set_text(label, new_text);
+    g_free(new_text); //Toca liberar la memoria manual porque no le saben al analisis lexico
 }
 
 
@@ -233,60 +225,36 @@ int main(int argc, char *argv[]) {
 
     //==================================================================================
 
-
-
-
       constant_input_entry= gtk_entry_new();
 
       gtk_entry_set_placeholder_text(GTK_ENTRY(constant_input_entry), "Escribe la constante aquí...");
-  gtk_box_pack_start(GTK_BOX(const_subpanel2), constant_input_entry, TRUE, TRUE, 0);
+      gtk_box_pack_start(GTK_BOX(const_subpanel2), constant_input_entry, TRUE, TRUE, 0);
 
 
 
 
- constant_button = gtk_button_new_with_label("Agregar Constante");
+    constant_button = gtk_button_new_with_label("Agregar Constante");
     gtk_box_pack_start(GTK_BOX(const_subpanel2), constant_button, TRUE, TRUE, 0);
 
 
+    input_entry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(input_entry), "Escribe la expresion aquí...");
 
 
+    gtk_box_pack_start(GTK_BOX(subpanel1), input_entry, TRUE, TRUE, 0);
 
-
-
-
-
-
-
-
-
-input_entry = gtk_entry_new();
-gtk_entry_set_placeholder_text(GTK_ENTRY(input_entry), "Escribe la expresion aquí...");
-   // gtk_grid_attach(GTK_GRID(grid), input_entry, 0, 1, 1, 1);
-
-
-  gtk_box_pack_start(GTK_BOX(subpanel1), input_entry, TRUE, TRUE, 0);
-
-
-
-
-
-
-
-
-   button = gtk_button_new_with_label("Enviar");
+    button = gtk_button_new_with_label("Enviar");
     gtk_box_pack_start(GTK_BOX(subpanel1), button, TRUE, TRUE, 0);
 
     GtkWidget *widgets[2] = { input_entry, history_label };
 
-  //   g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), history_label, input_entry);
-  g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), widgets);
+
+    g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), widgets);
 
 
     gtk_widget_show_all(window);
 
 
-    // Mostrar todos los widgets
-    gtk_widget_show_all(window);
 
     gtk_main();
 
