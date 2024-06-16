@@ -3,10 +3,11 @@
 #include <stack>
 #include <sstream>
 #include <string>
+#include <map>
 #include <cctype>
-using namespace std;
 
 bool esOperador(char c);
 int precedencia(char c);
-int evaluarPostfija(const std::string& expresion);
-
+double evaluarPostfija(const std::string& expresion);
+std::string infijaAPostfija(const std::string& infija);
+bool evaluarInfija(const std::string& expresion);
