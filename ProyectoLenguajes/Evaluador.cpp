@@ -36,6 +36,7 @@ void imprimirEstado(const std::string& resultado, const std::stack<char>& pila) 
 }
 
 std::string infijaAPostfija(const std::string& infija) {
+    std::cout << "-----Convirtiendo de infija a postfija-----" << std::endl;
     std::string postfija;
     std::stack<char> pila;
     std::string numero;
@@ -102,7 +103,20 @@ std::string infijaAPostfija(const std::string& infija) {
     return postfija;
 }
 
+void imprimirEstadoPila(const std::stack<double>& pila) {
+    std::stack<double> pilaCopia = pila;
+    std::ostringstream oss;
+    oss << "Pila => [ ";
+    while (!pilaCopia.empty()) {
+        oss << pilaCopia.top() << " ";
+        pilaCopia.pop();
+    }
+    oss << "]";
+    std::cout << oss.str() << "\n";
+}
+
 double evaluarPostfija(const std::string& expresion) {
+    std::cout << "-----Evaluando expresion postfija-----" << std::endl;
     std::stack<double> pila;
     std::stringstream ss(expresion);
     std::string token;
@@ -113,6 +127,7 @@ double evaluarPostfija(const std::string& expresion) {
 
         if (!token.empty() && (std::isdigit(token[0]) || token[0] == '.' || (token[0] == '-' && token.length() > 1))) {
             pila.push(std::stod(token));
+            imprimirEstadoPila(pila);
         } else if (!token.empty() && esOperador(token[0])) {
             double operand2 = pila.top(); pila.pop();
             double operand1 = pila.top(); pila.pop();
@@ -129,7 +144,8 @@ double evaluarPostfija(const std::string& expresion) {
                 case '/':
                     pila.push(operand1 / operand2);
                     break;
-             }
+            }
+            imprimirEstadoPila(pila);
         }
     }
     return pila.top();
@@ -137,25 +153,76 @@ double evaluarPostfija(const std::string& expresion) {
 
 bool evaluarInfija(const std::string& expresion) {
     std::stack<char> pila;
-    bool ultimoEsOperador = true; 
+    bool ultimoEsOperador = true;
+    bool puntoEnNumero = false;
+    bool huboDivision = false;
 
-    for (char c : expresion) {
-        if (std::isdigit(c) || c == '.') {
+    for (size_t i = 0; i < expresion.length(); ++i) {
+        char c = expresion[i];
+
+        if (std::isdigit(c)) {
+            if (huboDivision) {
+                if (c == '0') {
+                    size_t j = i + 1;
+                    while (j < expresion.length() && (std::isdigit(expresion[j]) || expresion[j] == '.')) {
+                        if (expresion[j] != '0') {
+                            break;
+                        }
+                        j++;
+                    }
+                    if (j == expresion.length() || !std::isdigit(expresion[j])) {
+                        std::cout << "Error: Division por cero.\n";
+                        return false;
+                    }
+                }
+                huboDivision = false;
+            }
             ultimoEsOperador = false;
+            puntoEnNumero = false;
+        } else if (c == '.') {
+            if (puntoEnNumero) {
+                std::cout << "Error: Numero inválido con multiples puntos.\n";
+                return false;
+            }
+            if (ultimoEsOperador) {
+                std::cout << "Error: El punto decimal no puede estar despues de un operador o al inicio.\n";
+                return false;
+            }
+            puntoEnNumero = true;
         } else if (esOperador(c)) {
-            if (ultimoEsOperador) return false; 
+            if (ultimoEsOperador) {
+                std::cout << "Error: Dos operadores seguidos o expresion comenzando con operador.\n";
+                return false;
+            }
+            if (c == '/') {
+                huboDivision = true;
+            }
             ultimoEsOperador = true;
         } else if (c == '(') {
             pila.push(c);
             ultimoEsOperador = true;
         } else if (c == ')') {
-            if (pila.empty() || pila.top() != '(') return false;
+            if (pila.empty() || pila.top() != '(') {
+                std::cout << "Error: Parentesis desbalanceados.\n";
+                return false;
+            }
             pila.pop();
             ultimoEsOperador = false;
-        } else if (!std::isspace(c)) { 
+        } else if (!std::isspace(c)) {
+            std::cout << "Error: Caracter inválido en la expresion.\n";
             return false;
         }
     }
-    if (ultimoEsOperador) return false; 
-    return pila.empty();
+
+    if (ultimoEsOperador) {
+        std::cout << "Error: La expresion no puede terminar con un operador.\n";
+        return false;
+    }
+
+    if (!pila.empty()) {
+        std::cout << "Error: Parentesis desbalanceados.\n";
+        return false;
+    }
+
+    return true;
 }
