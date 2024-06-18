@@ -1,8 +1,10 @@
-#include "Evaluador.h"
+//#include "Evaluador.h"
 
-int main() {
-    std::string expresionInfija = "3 + 4 * 5";
-    std::cout << "Expresion infija: " << expresionInfija << std::endl;
+//int main() {
+   // std::string expresionInfija = "3 + 4 * 5";
+  //  std::cout << "Expresion infija: " << expresionInfija << std::endl;
+
+  /*
 
     if(evaluarInfija(expresionInfija)){
         std::cout << "Expresion infija evaluada correctamente" << std::endl;
@@ -14,4 +16,4 @@ int main() {
         std::cout << "Expresion infija no se pudo evaluar" << std::endl;
     }
     return 0;
-}
+}*/

@@ -1,11 +1,16 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include "Evaluador.h"
+#include "Constantes.h"
 #include <iostream>
 #include <string>
 
 #include <fstream>
 #include <sstream>
+
+#include "Variables.h"
+
+using namespace std;
 
 
 
@@ -23,11 +28,13 @@ GtkWidget *history_label;
 GtkWidget *variables_label;
 
 
-
+GtkWidget *results_label;
 
 GtkWidget *scrolled_window;
 GtkWidget *variables_scrolled_window;
 GtkWidget *constant_scrolled_window;
+GtkWidget *results_scrolled_window;
+
 
 GtkWidget *hbox;
 
@@ -40,6 +47,12 @@ GtkWidget *subpanel1, *subpanel2;
 GtkWidget *variables_subpanel1, *variables_subpanel2;
 
 
+
+GtkWidget *window;
+
+Constantes constas;
+Variables vars(constas,window);
+
 std::string read_file_content(const std::string& file_path) {
     std::ifstream file(file_path);
     std::stringstream buffer;
@@ -49,57 +62,110 @@ std::string read_file_content(const std::string& file_path) {
         return buffer.str();
     } else {
         std::cerr << "Error al abrir el archivo: " << file_path << std::endl;
-        return "";
+        return "Error: No se pudo leer el archivo.";
     }
 }
 
+void show_alert(GtkWindow *parent, const gchar *message) {
+    GtkWidget *dialog;
+    dialog = gtk_message_dialog_new(parent,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                    GTK_MESSAGE_INFO,
+                                    GTK_BUTTONS_OK,
+                                    "%s", message);
+    gtk_window_set_title(GTK_WINDOW(dialog), "Alerta");
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
 
-static void on_button_clicked(GtkButton *button, gpointer user_data) {
 
-    GtkWidget **widgets = (GtkWidget **)user_data;
+static void on_button_clicked(GtkButton *button, gpointer My_Widgets) {
+
+    GtkWidget **widgets = (GtkWidget **)My_Widgets;
     GtkEntry *entry = GTK_ENTRY(widgets[0]);
-    GtkLabel *label = GTK_LABEL(widgets[1]);
+    GtkLabel *label = GTK_LABEL(history_label);
+     GtkWindow *parent_window = GTK_WINDOW(widgets[1]);
 
-    const gchar *entry_text = gtk_entry_get_text(entry); // Obtener el texto del entry
+    const gchar *entry_text = gtk_entry_get_text(entry);
     const gchar *current_text = gtk_label_get_text(label);
 
-    std::string entry_string(current_text);
+    std::string entry_string(entry_text);
+    //std::string expresionInfija = "3 + 4 * 5";
+    std::cout << "Expresion infija: "<< entry_string << std::endl;
+
+    int resultado = 0;
+    //               expresionInfija
+
+    std::string expresionReemplazadaBase = vars.reemplazarVariables(entry_string);
+      std::string expresionReemplazada = constas.reemplazarConstantes(expresionReemplazadaBase);
+
+        std::cout << "Expresion infija (VAR): "<< entry_string << std::endl;
+
+    if(evaluarInfija(expresionReemplazada)){
+     std::cout << "Expresion infija evaluada correctamente" << std::endl;
+        std::string expresionPostfija = infijaAPostfija(expresionReemplazada);
+        std::cout << "Expresion postfija: " << expresionPostfija << std::endl;
+        int resultadoInfija = evaluarPostfija(expresionPostfija);
+        resultado = resultadoInfija;
+    }  else {
+        std::cout << "Expresion infija no se pudo evaluar" << std::endl;
+    }
 
 
-    int resultado = evaluarPostfija(entry_string);
+
+
     cout << "Resultado: " << resultado << endl;
 
     gchar *new_text = g_strconcat(entry_text, "\n", current_text, NULL);
-    gtk_label_set_text(label, new_text);
-    g_free(new_text); //Toca liberar la memoria manual porque no le saben al analisis lexico
+    gtk_label_set_text(label, new_text); //HISTORIAL
+
+
+    GtkLabel *labelResults = GTK_LABEL(results_label);
+    gchar *tempResult = g_strdup_printf("%d", resultado);
+    gtk_label_set_text(labelResults, tempResult); //RESULTADO
+
+
+    gchar *result_message = g_strdup_printf("Resultado: %d", resultado);
+    show_alert(parent_window, result_message);
+
+
+
+}
+
+static void on_variables_button_clicked(GtkButton *button, gpointer My_Widgets) {
+
+    GtkWidget **widgets = (GtkWidget **)My_Widgets;
+    GtkEntry *entry = GTK_ENTRY(widgets[0]);
+    GtkLabel *label = GTK_LABEL(variables_label);
+    GtkWindow *parent_window = GTK_WINDOW(widgets[1]);
+
+
+
+    const gchar *entry_text = gtk_entry_get_text(entry);
+    std::string entry_string(entry_text);
+
+    vars.insertarVariable(entry_string);
+    vars.imprimirVariables();
+
+
+    gtk_label_set_text(label, vars.obtenerCadenaDeVariables());
+
+
+
 }
 
 
-
-
-void show_text(const gchar *text) {
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
-    gtk_text_buffer_set_text(buffer, text, -1);
-}
-
-
-void handle_expression_button(GtkWidget *widget, gpointer data) {
-    const gchar *expression = gtk_entry_get_text(GTK_ENTRY(input_entry));
-
-    const gchar *current_text = gtk_label_get_text(GTK_LABEL(history_label));
-    gchar *new_text = g_strdup_printf("%s\n%s", current_text, expression);
-    gtk_label_set_text(GTK_LABEL(history_label), new_text);
-    g_free(new_text);
-}
 
 int main(int argc, char *argv[]) {
+
+constas.imprimirConstantes();
 
 
 std::string file_content = read_file_content("constantes");
 const gchar* label_text = file_content.c_str();
 
 
-    GtkWidget *window;
+
     GtkWidget *container;
     GtkWidget *grid;
 
@@ -119,7 +185,7 @@ const gchar* label_text = file_content.c_str();
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(window), hbox);
 
-    // Crear los tres paneles
+
     panel1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     panel2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     panel3 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -135,13 +201,13 @@ const gchar* label_text = file_content.c_str();
     gtk_widget_override_background_color(panel2, GTK_STATE_FLAG_NORMAL, NULL );
     gtk_widget_override_background_color(panel3, GTK_STATE_FLAG_NORMAL, &yellow);
 
-    // Añadir los paneles al contenedor horizontal
+
     gtk_box_pack_start(GTK_BOX(hbox), panel1, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), panel2, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), panel3, TRUE, TRUE, 0);
 
 
-// Crear subpaneles para panel2
+
     subpanel1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     subpanel2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
@@ -152,7 +218,7 @@ const gchar* label_text = file_content.c_str();
 
 
 
-    // Asignar colores diferentes a los subpaneles
+
     gtk_widget_override_background_color(subpanel1, GTK_STATE_FLAG_NORMAL, NULL);
     gtk_widget_override_background_color(subpanel2, GTK_STATE_FLAG_NORMAL, &purple);
 
@@ -164,113 +230,135 @@ const gchar* label_text = file_content.c_str();
 
     gtk_box_pack_start(GTK_BOX(panel3), variables_subpanel1, TRUE, TRUE, 10);
     gtk_box_pack_start(GTK_BOX(panel3), variables_subpanel2, TRUE, TRUE, 1);
-     // Crear un Label para mostrar el historial de expresiones
-   // history_label = gtk_label_new("Historial: ");
-   // gtk_grid_attach(GTK_GRID(grid), history_label, 0, 2, 1, 1);
+
+
+
+
+
+
+      //==============================PANEL 1===================================================
+
+    constant_label = gtk_label_new( g_strconcat("Constantes: " , "\n", label_text, NULL));
+    gtk_label_set_xalign(GTK_LABEL(constant_label), 0.0);
+    gtk_label_set_yalign(GTK_LABEL(constant_label), 0.0);
+    gtk_label_set_line_wrap(GTK_LABEL(constant_label), TRUE);
+    gtk_label_set_selectable(GTK_LABEL(constant_label), TRUE);
+
+
+    constant_scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_vexpand(constant_scrolled_window, TRUE);
+    gtk_widget_set_hexpand(constant_scrolled_window, TRUE);
+    gtk_container_add(GTK_CONTAINER(constant_scrolled_window), constant_label);
+
+
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(constant_scrolled_window), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+
+
+
+    gtk_box_pack_start(GTK_BOX(panel1), constant_scrolled_window, TRUE, TRUE, 0);
 
     //==================================================================================
 
+    //==================================PANEL 2================================================
+    input_entry = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(input_entry), "Escribe la expresion aquí...");
+    gtk_box_pack_start(GTK_BOX(subpanel1), input_entry, TRUE, TRUE, 0);
+
+    button = gtk_button_new_with_label("Enviar");
+    gtk_box_pack_start(GTK_BOX(subpanel1), button, TRUE, TRUE, 0);
+    GtkWidget *widgets[2] = { input_entry , window};
+    g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), widgets);
+
+
+    results_label = gtk_label_new( g_strconcat(" " , "\n",  NULL));
+    gtk_label_set_xalign(GTK_LABEL(results_label), 0.0);
+    gtk_label_set_yalign(GTK_LABEL(results_label), 0.0);
+    gtk_label_set_line_wrap(GTK_LABEL(results_label), TRUE);
+    gtk_label_set_selectable(GTK_LABEL(results_label), TRUE);
+
+    results_scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_vexpand(results_scrolled_window, TRUE);
+    gtk_widget_set_hexpand(results_scrolled_window, TRUE);
+    gtk_container_add(GTK_CONTAINER(results_scrolled_window), results_label);
+
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(results_scrolled_window), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+
+
+    gtk_box_pack_start(GTK_BOX(subpanel1), results_scrolled_window, TRUE, TRUE, 0);
+
+
+
     history_label = gtk_label_new("Historial: " );
-    gtk_label_set_xalign(GTK_LABEL(history_label), 0.0); // Alinear texto a la izquierda
-    gtk_label_set_yalign(GTK_LABEL(history_label), 0.0); // Alinear texto en la parte superior
-    gtk_label_set_line_wrap(GTK_LABEL(history_label), TRUE); // Habilitar el salto de línea
+    gtk_label_set_xalign(GTK_LABEL(history_label), 0.0);
+    gtk_label_set_yalign(GTK_LABEL(history_label), 0.0);
+    gtk_label_set_line_wrap(GTK_LABEL(history_label), TRUE);
     gtk_label_set_selectable(GTK_LABEL(history_label), TRUE);
 
-    // Crear un GtkScrolledWindow
+
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_vexpand(scrolled_window, TRUE); // Permitir que el scrolled window se expanda verticalmente
-    gtk_widget_set_hexpand(scrolled_window, TRUE); // Permitir que el scrolled window se expanda horizontalmente
+    gtk_widget_set_vexpand(scrolled_window, TRUE);
+    gtk_widget_set_hexpand(scrolled_window, TRUE);
     gtk_container_add(GTK_CONTAINER(scrolled_window), history_label);
 
-    // Configurar las políticas de desplazamiento
+
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-
-    // Añadir el GtkScrolledWindow al tercer panel
     gtk_box_pack_start(GTK_BOX(subpanel2), scrolled_window, TRUE, TRUE, 0);
 
     //==================================================================================
 
 
-
-
-
-
-
-
         //==============================PANEL 3===================================================
 
+
+          //SUBPANEL 1
+
     variables_label = gtk_label_new("Variables: " );
-    gtk_label_set_xalign(GTK_LABEL(variables_label), 0.0); // Alinear texto a la izquierda
-    gtk_label_set_yalign(GTK_LABEL(variables_label), 0.0); // Alinear texto en la parte superior
-    gtk_label_set_line_wrap(GTK_LABEL(variables_label), TRUE); // Habilitar el salto de línea
+    gtk_label_set_xalign(GTK_LABEL(variables_label), 0.0);
+    gtk_label_set_yalign(GTK_LABEL(variables_label), 0.0);
+    gtk_label_set_line_wrap(GTK_LABEL(variables_label), TRUE);
     gtk_label_set_selectable(GTK_LABEL(variables_label), TRUE);
 
-    // Crear un GtkScrolledWindow
+
     variables_scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_vexpand(variables_scrolled_window, TRUE); // Permitir que el scrolled window se expanda verticalmente
-    gtk_widget_set_hexpand(variables_scrolled_window, TRUE); // Permitir que el scrolled window se expanda horizontalmente
+    gtk_widget_set_vexpand(variables_scrolled_window, TRUE);
+    gtk_widget_set_hexpand(variables_scrolled_window, TRUE);
     gtk_container_add(GTK_CONTAINER(variables_scrolled_window), variables_label);
 
-    // Configurar las políticas de desplazamiento
+
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(variables_scrolled_window), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
 
-    // Añadir el GtkScrolledWindow al tercer panel
+
     gtk_box_pack_start(GTK_BOX(variables_subpanel1), variables_scrolled_window, TRUE, TRUE, 0);
 
-    //==================================================================================
 
 
+    //SUBPANEL 2
 
-      //==============================PANEL 1===================================================
-//g_strconcat(entry_text, "\n", current_text, NULL);
-    constant_label = gtk_label_new( g_strconcat("Constantes: " , "\n", label_text, NULL));
-    gtk_label_set_xalign(GTK_LABEL(constant_label), 0.0); // Alinear texto a la izquierda
-    gtk_label_set_yalign(GTK_LABEL(constant_label), 0.0); // Alinear texto en la parte superior
-    gtk_label_set_line_wrap(GTK_LABEL(constant_label), TRUE); // Habilitar el salto de línea
-    gtk_label_set_selectable(GTK_LABEL(constant_label), TRUE);
-
-    // Crear un GtkScrolledWindow
-    constant_scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_widget_set_vexpand(constant_scrolled_window, TRUE); // Permitir que el scrolled window se expanda verticalmente
-    gtk_widget_set_hexpand(constant_scrolled_window, TRUE); // Permitir que el scrolled window se expanda horizontalmente
-    gtk_container_add(GTK_CONTAINER(constant_scrolled_window), constant_label);
-
-    // Configurar las políticas de desplazamiento
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(constant_scrolled_window), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-
-
-    // Añadir el GtkScrolledWindow al tercer panel
-    gtk_box_pack_start(GTK_BOX(panel1), constant_scrolled_window, TRUE, TRUE, 0);
-
-    //==================================================================================
-
-      variables_input_entry= gtk_entry_new();
+        variables_input_entry= gtk_entry_new();
 
       gtk_entry_set_placeholder_text(GTK_ENTRY(variables_input_entry), "Escribe la variable aquí...");
       gtk_box_pack_start(GTK_BOX(variables_subpanel2), variables_input_entry, TRUE, TRUE, 0);
-
-
-
 
     variables_button = gtk_button_new_with_label("Agregar Variable");
     gtk_box_pack_start(GTK_BOX(variables_subpanel2), variables_button, TRUE, TRUE, 0);
 
 
-    input_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(input_entry), "Escribe la expresion aquí...");
+
+    GtkWidget *widgets2[2] = { variables_input_entry, window};
+    g_signal_connect(variables_button, "clicked", G_CALLBACK(on_variables_button_clicked), widgets2);
+
+    //==================================================================================
 
 
-    gtk_box_pack_start(GTK_BOX(subpanel1), input_entry, TRUE, TRUE, 0);
-
-    button = gtk_button_new_with_label("Enviar");
-    gtk_box_pack_start(GTK_BOX(subpanel1), button, TRUE, TRUE, 0);
-
-    GtkWidget *widgets[2] = { input_entry, history_label };
 
 
-    g_signal_connect(button, "clicked", G_CALLBACK(on_button_clicked), widgets);
+
+
+
+
+
 
 
     gtk_widget_show_all(window);
@@ -281,3 +369,4 @@ const gchar* label_text = file_content.c_str();
 
     return EXIT_SUCCESS;
 }
+//*/
