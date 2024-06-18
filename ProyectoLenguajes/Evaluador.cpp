@@ -24,6 +24,17 @@ bool esOperador(char c) {
     return c == '+' || c == '-' || c == '*' || c == '/';
 }
 
+void imprimirEstado(const std::string& resultado, const std::stack<char>& pila) {
+    std::cout << "Resultado => " << resultado << "\n";
+    std::cout << "Pila => [ ";
+    std::stack<char> pilaCopia = pila;
+    while (!pilaCopia.empty()) {
+        std::cout << pilaCopia.top() << " ";
+        pilaCopia.pop();
+    }
+    std::cout << "]\n";
+}
+
 std::string infijaAPostfija(const std::string& infija) {
     std::string postfija;
     std::stack<char> pila;
@@ -41,6 +52,7 @@ std::string infijaAPostfija(const std::string& infija) {
                 }
                 postfija += numero;
                 numero.clear();
+                imprimirEstado(postfija, pila);
             }
 
             if (ch == '(') {
@@ -52,6 +64,7 @@ std::string infijaAPostfija(const std::string& infija) {
                     }
                     postfija += pila.top();
                     pila.pop();
+                    imprimirEstado(postfija, pila);
                 }
                 pila.pop();
             } else {
@@ -61,9 +74,11 @@ std::string infijaAPostfija(const std::string& infija) {
                     }
                     postfija += pila.top();
                     pila.pop();
+                    imprimirEstado(postfija, pila);
                 }
                 pila.push(ch);
             }
+            imprimirEstado(postfija, pila);
         }
     }
 
@@ -72,6 +87,7 @@ std::string infijaAPostfija(const std::string& infija) {
             postfija += ", ";
         }
         postfija += numero;
+        imprimirEstado(postfija, pila);
     }
 
     while (!pila.empty()) {
@@ -80,6 +96,7 @@ std::string infijaAPostfija(const std::string& infija) {
         }
         postfija += pila.top();
         pila.pop();
+        imprimirEstado(postfija, pila);
     }
 
     return postfija;
