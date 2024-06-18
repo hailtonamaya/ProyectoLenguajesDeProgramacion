@@ -9,6 +9,7 @@
 
 /x64/
 /.vs/
+/.vscode/
 
 # Precompiled Headers
 *.gch
