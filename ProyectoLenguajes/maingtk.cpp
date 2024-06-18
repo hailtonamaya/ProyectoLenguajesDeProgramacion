@@ -50,6 +50,7 @@ GtkWidget *variables_subpanel1, *variables_subpanel2;
 
 GtkWidget *window;
 
+Evaluador Eval(window);
 Constantes constas;
 Variables vars(constas,window);
 
@@ -93,7 +94,7 @@ static void on_button_clicked(GtkButton *button, gpointer My_Widgets) {
     //std::string expresionInfija = "3 + 4 * 5";
     std::cout << "Expresion infija: "<< entry_string << std::endl;
 
-    int resultado = 0;
+    double resultado = 0;
     //               expresionInfija
 
     std::string expresionReemplazadaBase = vars.reemplazarVariables(entry_string);
@@ -101,32 +102,43 @@ static void on_button_clicked(GtkButton *button, gpointer My_Widgets) {
 
         std::cout << "Expresion infija (VAR): "<< entry_string << std::endl;
 
-    if(evaluarInfija(expresionReemplazada)){
+    if(Eval.evaluarInfija(expresionReemplazada)){
      std::cout << "Expresion infija evaluada correctamente" << std::endl;
-        std::string expresionPostfija = infijaAPostfija(expresionReemplazada);
+        std::string expresionPostfija = Eval.infijaAPostfija(expresionReemplazada);
         std::cout << "Expresion postfija: " << expresionPostfija << std::endl;
-        int resultadoInfija = evaluarPostfija(expresionPostfija);
+        double resultadoInfija = Eval.evaluarPostfija(expresionPostfija);
+             std::cout << "resultadoInfija: " << resultadoInfija << std::endl;
         resultado = resultadoInfija;
-    }  else {
-        std::cout << "Expresion infija no se pudo evaluar" << std::endl;
-    }
 
 
 
 
-    cout << "Resultado: " << resultado << endl;
+
+            cout << "Resultado: " << resultado << endl;
 
     gchar *new_text = g_strconcat(entry_text, "\n", current_text, NULL);
     gtk_label_set_text(label, new_text); //HISTORIAL
 
 
     GtkLabel *labelResults = GTK_LABEL(results_label);
-    gchar *tempResult = g_strdup_printf("%d", resultado);
+    gchar *tempResult = g_strdup_printf("%f", resultado);
     gtk_label_set_text(labelResults, tempResult); //RESULTADO
 
 
-    gchar *result_message = g_strdup_printf("Resultado: %d", resultado);
-    show_alert(parent_window, result_message);
+
+    }  else {
+    show_alert(parent_window, "Expresion infija no se pudo evaluar");
+
+    }
+
+
+
+
+
+
+
+    //gchar *result_message = g_strdup_printf("Resultado: %f", resultado);
+   // show_alert(parent_window, result_message);
 
 
 

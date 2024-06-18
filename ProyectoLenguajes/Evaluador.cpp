@@ -4,6 +4,23 @@
 #include <string>
 #include <cctype>
 
+Evaluador::Evaluador( GtkWidget *mainWindow)
+    :  mainWindow(mainWindow) {
+
+}
+
+void Evaluador::showAlert(const std::string& message) {
+    GtkWidget *dialog;
+    dialog = gtk_message_dialog_new(GTK_WINDOW(mainWindow),
+                                    GTK_DIALOG_MODAL,
+                                    GTK_MESSAGE_INFO,
+                                    GTK_BUTTONS_OK,
+                                    "%s",
+                                    message.c_str());
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
 int precedencia(char op) {
     switch (op) {
     case '+':
@@ -24,18 +41,21 @@ bool esOperador(char c) {
     return c == '+' || c == '-' || c == '*' || c == '/';
 }
 
-void imprimirEstado(const std::string& resultado, const std::stack<char>& pila) {
-    std::cout << "Resultado => " << resultado << "\n";
-    std::cout << "Pila => [ ";
+void Evaluador::imprimirEstado(const std::string& resultado, const std::stack<char>& pila) {
+    std::string mensaje = "Resultado => " + resultado + "\nPila => [ ";
     std::stack<char> pilaCopia = pila;
     while (!pilaCopia.empty()) {
-        std::cout << pilaCopia.top() << " ";
+        mensaje += pilaCopia.top();
+        mensaje += " ";
         pilaCopia.pop();
     }
-    std::cout << "]\n";
+    mensaje += "]";
+    std::cout << mensaje << std::endl;
+   // showAlert(mensaje);
 }
 
-std::string infijaAPostfija(const std::string& infija) {
+std::string Evaluador::infijaAPostfija(const std::string& infija) {
+    //showAlert("-----Convirtiendo de infija a postfija-----");
     std::cout << "-----Convirtiendo de infija a postfija-----" << std::endl;
     std::string postfija;
     std::stack<char> pila;
@@ -103,7 +123,7 @@ std::string infijaAPostfija(const std::string& infija) {
     return postfija;
 }
 
-void imprimirEstadoPila(const std::stack<double>& pila) {
+void Evaluador::imprimirEstadoPila(const std::stack<double>& pila) {
     std::stack<double> pilaCopia = pila;
     std::ostringstream oss;
     oss << "Pila => [ ";
@@ -112,10 +132,13 @@ void imprimirEstadoPila(const std::stack<double>& pila) {
         pilaCopia.pop();
     }
     oss << "]";
-    std::cout << oss.str() << "\n";
+    std::string mensaje = oss.str();
+    std::cout << mensaje << std::endl;
+    //showAlert(mensaje);
 }
 
-double evaluarPostfija(const std::string& expresion) {
+double Evaluador::evaluarPostfija(const std::string& expresion) {
+    //showAlert("-----Evaluando expresion postfija-----");
     std::cout << "-----Evaluando expresion postfija-----" << std::endl;
     std::stack<double> pila;
     std::stringstream ss(expresion);
@@ -151,7 +174,7 @@ double evaluarPostfija(const std::string& expresion) {
     return pila.top();
 }
 
-bool evaluarInfija(const std::string& expresion) {
+bool Evaluador::evaluarInfija(const std::string& expresion) {
     std::stack<char> pila;
     bool ultimoEsOperador = true;
     bool puntoEnNumero = false;
@@ -171,7 +194,9 @@ bool evaluarInfija(const std::string& expresion) {
                         j++;
                     }
                     if (j == expresion.length() || !std::isdigit(expresion[j])) {
-                        std::cout << "Error: Division por cero.\n";
+                        std::string mensaje = "Error: Division por cero.";
+                        std::cout << mensaje << std::endl;
+                        showAlert(mensaje);
                         return false;
                     }
                 }
@@ -181,17 +206,23 @@ bool evaluarInfija(const std::string& expresion) {
             puntoEnNumero = false;
         } else if (c == '.') {
             if (puntoEnNumero) {
-                std::cout << "Error: Numero inválido con multiples puntos.\n";
+                std::string mensaje = "Error: Numero inválido con multiples puntos.";
+                std::cout << mensaje << std::endl;
+                showAlert(mensaje);
                 return false;
             }
             if (ultimoEsOperador) {
-                std::cout << "Error: El punto decimal no puede estar despues de un operador o al inicio.\n";
+                std::string mensaje = "Error: El punto decimal no puede estar despues de un operador o al inicio.";
+                std::cout << mensaje << std::endl;
+                showAlert(mensaje);
                 return false;
             }
             puntoEnNumero = true;
         } else if (esOperador(c)) {
             if (ultimoEsOperador) {
-                std::cout << "Error: Dos operadores seguidos o expresion comenzando con operador.\n";
+                std::string mensaje = "Error: Dos operadores seguidos o expresion comenzando con operador.";
+                std::cout << mensaje << std::endl;
+                showAlert(mensaje);
                 return false;
             }
             if (c == '/') {
@@ -203,24 +234,32 @@ bool evaluarInfija(const std::string& expresion) {
             ultimoEsOperador = true;
         } else if (c == ')') {
             if (pila.empty() || pila.top() != '(') {
-                std::cout << "Error: Parentesis desbalanceados.\n";
+                std::string mensaje = "Error: Parentesis desbalanceados.";
+                std::cout << mensaje << std::endl;
+                showAlert(mensaje);
                 return false;
             }
             pila.pop();
             ultimoEsOperador = false;
         } else if (!std::isspace(c)) {
-            std::cout << "Error: Caracter inválido en la expresion.\n";
+            std::string mensaje = "Error: Caracter inválido en la expresion.";
+            std::cout << mensaje << std::endl;
+            showAlert(mensaje);
             return false;
         }
     }
 
     if (ultimoEsOperador) {
-        std::cout << "Error: La expresion no puede terminar con un operador.\n";
+        std::string mensaje = "Error: La expresion no puede terminar con un operador.";
+        std::cout << mensaje << std::endl;
+        showAlert(mensaje);
         return false;
     }
 
     if (!pila.empty()) {
-        std::cout << "Error: Parentesis desbalanceados.\n";
+        std::string mensaje = "Error: Parentesis desbalanceados.";
+        std::cout << mensaje << std::endl;
+        showAlert(mensaje);
         return false;
     }
 

@@ -21,7 +21,7 @@ public:
     Variables(Constantes constantesFile, GtkWidget *mainWindow)
         : constantes(constantesFile), mainWindow(mainWindow) {}
 
-    // Función para mostrar una alerta en GTK
+
     void show_alert(const std::string &message) const {
         GtkWidget *dialog;
         dialog = gtk_message_dialog_new(GTK_WINDOW(mainWindow),
@@ -53,7 +53,7 @@ public:
         double valor;
 
         if (std::getline(stream, nombre, '=') && stream >> valor) {
-            // Verificar si el nombre ya existe en las constantes
+
             if (!constantes.validarNombre(nombre)) {
                 std::stringstream ss;
                 ss << "Error: El nombre '" << nombre << "' está definido como constante y no se puede modificar.";
@@ -61,15 +61,15 @@ public:
                 return;
             }
 
-            // Verificar si el nombre ya existe en las variables
+
             auto it = std::find_if(variables.begin(), variables.end(),
                                    [&nombre](const Variable &v) { return v.nombre == nombre; });
 
             if (it != variables.end()) {
-                // Actualizar el valor de la variable existente
+
                 it->valor = valor;
             } else {
-                // Insertar nueva variable
+
                 Variable var = {nombre, valor};
                 variables.push_back(var);
             }

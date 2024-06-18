@@ -1,4 +1,4 @@
-#include "Evaluador.h"
+/*#include "Evaluador.h"
 
 int main() {
     std::string expresionInfija = "10 + 5 * (2 - 7) / (3 + 2) * 4 / a";
@@ -14,4 +14,4 @@ int main() {
         std::cout << "Expresion infija no se pudo evaluar" << std::endl;
     }
     return 0;
-}
+}*/
