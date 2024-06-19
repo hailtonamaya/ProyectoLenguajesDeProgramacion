@@ -16,6 +16,7 @@ int precedencia(char c);
 class Evaluador {
 public:
     Evaluador( GtkWidget *mainWindow);
+    Evaluador( );
 
     void showAlert(const std::string& message);
     void imprimirEstado(const std::string& resultado, const std::stack<char>& pila);
@@ -27,6 +28,7 @@ public:
 private:
 
     GtkWidget *mainWindow;
+    bool MostrarInterfaz = false;
 };
 
 #endif // EVALUADOR_H
