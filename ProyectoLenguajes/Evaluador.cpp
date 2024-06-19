@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <cctype>
+#include <cmath>
 
 using namespace std;
 
@@ -19,7 +20,7 @@ MostrarInterfaz=false;
 void Evaluador::showAlert(const string& message) {
 
 
-if(false){
+if(MostrarInterfaz){
     GtkWidget *dialog;
     dialog = gtk_message_dialog_new(GTK_WINDOW(mainWindow),
                                     GTK_DIALOG_MODAL,
@@ -39,7 +40,10 @@ int precedencia(char op) {
         return 1;
     case '*':
     case '/':
+    case '%':
         return 2;
+    case '^':
+        return 3;
     case '(':
     case ')':
         return 0;
@@ -49,7 +53,7 @@ int precedencia(char op) {
 }
 
 bool esOperador(char c) {
-    return c == '+' || c == '-' || c == '*' || c == '/';
+    return c == '+' || c == '-' || c == '*' || c == '/'|| c == '%'|| c == '^';
 }
 
 void Evaluador::imprimirEstado(const string& resultado, const stack<char>& pila) {
@@ -180,6 +184,12 @@ if(MostrarInterfaz){    cout << "-----Evaluando expresion postfija-----" << endl
                 case '/':
                     pila.push(operand1 / operand2);
                     break;
+                case '%':
+                    pila.push(fmod(operand1, operand2));
+                    break;
+                case '^':
+                    pila.push(pow(operand1, operand2));
+                    break;
             }
           if(MostrarInterfaz){  imprimirEstadoPila(pila);}
         }
@@ -207,7 +217,7 @@ bool Evaluador::evaluarInfija(const string& expresion) {
                         j++;
                     }
                     if (j == expresion.length() || !isdigit(expresion[j])) {
-                        string mensaje = "Error: Division por cero.";
+                        string mensaje = "Error: Expresion no se puede evaluar por cero.";
                       if(MostrarInterfaz){  cout << mensaje << endl;
                         showAlert(mensaje);}
                         return false;
@@ -238,7 +248,7 @@ bool Evaluador::evaluarInfija(const string& expresion) {
                 if(MostrarInterfaz){cout << mensaje << endl;showAlert(mensaje);}
                 return false;
             }
-            if (c == '/') {
+            if (c == '/' || c == '%') {
                 huboDivision = true;
             }
             ultimoEsOperador = true;

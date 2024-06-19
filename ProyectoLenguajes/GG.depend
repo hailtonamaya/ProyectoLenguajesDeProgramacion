@@ -3136,14 +3136,14 @@
 
 1715117448 /usr/include/gtk-3.0/gtk/gtk-autocleanups.h
 
-1718731514 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.cpp
+1718836598 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.cpp
 	"Evaluador.h"
 	<stack>
 	<sstream>
 	<string>
 	<cctype>
 
-1718753733 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.h
+1718828748 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.h
 	<iostream>
 	<stack>
 	<sstream>
@@ -3152,7 +3152,7 @@
 	<cctype>
 	<gtk/gtk.h>
 
-1718731713 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/maingtk.cpp
+1718828865 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/maingtk.cpp
 	<stdlib.h>
 	<gtk/gtk.h>
 	"Evaluador.h"
@@ -3170,7 +3170,7 @@
 
 1718717743 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/src/Variables.cpp
 
-1718731199 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/include/Variables.h
+1718828844 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/include/Variables.h
 	<iostream>
 	<sstream>
 	<string>
@@ -3183,7 +3183,7 @@
 
 1718721797 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/src/Constantes.cpp
 
-1718727023 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/include/Constantes.h
+1718828804 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/include/Constantes.h
 	<iostream>
 	<fstream>
 	<sstream>
