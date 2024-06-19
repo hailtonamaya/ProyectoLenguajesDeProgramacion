@@ -4,6 +4,8 @@
 #include <string>
 #include <cctype>
 
+using namespace std;
+
 Evaluador::Evaluador( GtkWidget *mainWindow)
     :  mainWindow(mainWindow), MostrarInterfaz(true) {
 MostrarInterfaz=true;
@@ -14,7 +16,7 @@ Evaluador::Evaluador( )
 MostrarInterfaz=false;
 }
 
-void Evaluador::showAlert(const std::string& message) {
+void Evaluador::showAlert(const string& message) {
 
 
 if(false){
@@ -50,32 +52,32 @@ bool esOperador(char c) {
     return c == '+' || c == '-' || c == '*' || c == '/';
 }
 
-void Evaluador::imprimirEstado(const std::string& resultado, const std::stack<char>& pila) {
-  std::string mensaje = "Resultado => " + resultado + "\nPila => [ ";
+void Evaluador::imprimirEstado(const string& resultado, const stack<char>& pila) {
+  string mensaje = "Resultado => " + resultado + "\nPila => [ ";
 
 
-    std::stack<char> pilaCopia = pila;
+    stack<char> pilaCopia = pila;
     while (!pilaCopia.empty()) {
         mensaje += pilaCopia.top();
         mensaje += " ";
         pilaCopia.pop();
     }
     mensaje += "]";
-   if(MostrarInterfaz){ std::cout << mensaje << std::endl;}
+   if(MostrarInterfaz){ cout << mensaje << endl;}
    // showAlert(mensaje);
 }
 
-std::string Evaluador::infijaAPostfija(const std::string& infija) {
+string Evaluador::infijaAPostfija(const string& infija) {
     //showAlert("-----Convirtiendo de infija a postfija-----");
-   if(MostrarInterfaz){ std::cout << "-----Convirtiendo de infija a postfija-----" << std::endl;}
-    std::string postfija;
-    std::stack<char> pila;
-    std::string numero;
+   if(MostrarInterfaz){ cout << "-----Convirtiendo de infija a postfija-----" << endl;}
+    string postfija;
+    stack<char> pila;
+    string numero;
 
     for (char ch : infija) {
-        if (std::isspace(ch)) {
+        if (isspace(ch)) {
             continue;
-        } else if (std::isdigit(ch) || ch == '.') {
+        } else if (isdigit(ch) || ch == '.') {
             numero += ch;
         } else {
             if (!numero.empty()) {
@@ -134,33 +136,33 @@ std::string Evaluador::infijaAPostfija(const std::string& infija) {
     return postfija;
 }
 
-void Evaluador::imprimirEstadoPila(const std::stack<double>& pila) {
-    std::stack<double> pilaCopia = pila;
-    std::ostringstream oss;
+void Evaluador::imprimirEstadoPila(const stack<double>& pila) {
+    stack<double> pilaCopia = pila;
+    ostringstream oss;
     oss << "Pila => [ ";
     while (!pilaCopia.empty()) {
         oss << pilaCopia.top() << " ";
         pilaCopia.pop();
     }
     oss << "]";
-    std::string mensaje = oss.str();
- if(MostrarInterfaz){   std::cout << mensaje << std::endl;}
+    string mensaje = oss.str();
+ if(MostrarInterfaz){   cout << mensaje << endl;}
     //showAlert(mensaje);
 }
 
-double Evaluador::evaluarPostfija(const std::string& expresion) {
+double Evaluador::evaluarPostfija(const string& expresion) {
     //showAlert("-----Evaluando expresion postfija-----");
-if(MostrarInterfaz){    std::cout << "-----Evaluando expresion postfija-----" << std::endl;}
-    std::stack<double> pila;
-    std::stringstream ss(expresion);
-    std::string token;
+if(MostrarInterfaz){    cout << "-----Evaluando expresion postfija-----" << endl;}
+    stack<double> pila;
+    stringstream ss(expresion);
+    string token;
 
-    while (std::getline(ss, token, ',')) {
+    while (getline(ss, token, ',')) {
         token.erase(0, token.find_first_not_of(" "));
         token.erase(token.find_last_not_of(" ") + 1);
 
-        if (!token.empty() && (std::isdigit(token[0]) || token[0] == '.' || (token[0] == '-' && token.length() > 1))) {
-            pila.push(std::stod(token));
+        if (!token.empty() && (isdigit(token[0]) || token[0] == '.' || (token[0] == '-' && token.length() > 1))) {
+            pila.push(stod(token));
            if(MostrarInterfaz){ imprimirEstadoPila(pila);}
         } else if (!token.empty() && esOperador(token[0])) {
             double operand2 = pila.top(); pila.pop();
@@ -185,8 +187,8 @@ if(MostrarInterfaz){    std::cout << "-----Evaluando expresion postfija-----" <<
     return pila.top();
 }
 
-bool Evaluador::evaluarInfija(const std::string& expresion) {
-    std::stack<char> pila;
+bool Evaluador::evaluarInfija(const string& expresion) {
+    stack<char> pila;
     bool ultimoEsOperador = true;
     bool puntoEnNumero = false;
     bool huboDivision = false;
@@ -194,19 +196,19 @@ bool Evaluador::evaluarInfija(const std::string& expresion) {
     for (size_t i = 0; i < expresion.length(); ++i) {
         char c = expresion[i];
 
-        if (std::isdigit(c)) {
+        if (isdigit(c)) {
             if (huboDivision) {
                 if (c == '0') {
                     size_t j = i + 1;
-                    while (j < expresion.length() && (std::isdigit(expresion[j]) || expresion[j] == '.')) {
+                    while (j < expresion.length() && (isdigit(expresion[j]) || expresion[j] == '.')) {
                         if (expresion[j] != '0') {
                             break;
                         }
                         j++;
                     }
-                    if (j == expresion.length() || !std::isdigit(expresion[j])) {
-                        std::string mensaje = "Error: Division por cero.";
-                      if(MostrarInterfaz){  std::cout << mensaje << std::endl;
+                    if (j == expresion.length() || !isdigit(expresion[j])) {
+                        string mensaje = "Error: Division por cero.";
+                      if(MostrarInterfaz){  cout << mensaje << endl;
                         showAlert(mensaje);}
                         return false;
                     }
@@ -217,23 +219,23 @@ bool Evaluador::evaluarInfija(const std::string& expresion) {
             puntoEnNumero = false;
         } else if (c == '.') {
             if (puntoEnNumero) {
-                std::string mensaje = "Error: Numero inválido con multiples puntos.";
+                string mensaje = "Error: Numero inválido con multiples puntos.";
 
-                if(MostrarInterfaz){std::cout << mensaje << std::endl;showAlert(mensaje);}
+                if(MostrarInterfaz){cout << mensaje << endl;showAlert(mensaje);}
                 return false;
             }
             if (ultimoEsOperador) {
-                std::string mensaje = "Error: El punto decimal no puede estar despues de un operador o al inicio.";
+                string mensaje = "Error: El punto decimal no puede estar despues de un operador o al inicio.";
 
-             if(MostrarInterfaz){  std::cout << mensaje << std::endl;showAlert(mensaje);}
+             if(MostrarInterfaz){  cout << mensaje << endl;showAlert(mensaje);}
                 return false;
             }
             puntoEnNumero = true;
         } else if (esOperador(c)) {
             if (ultimoEsOperador) {
-                std::string mensaje = "Error: Dos operadores seguidos o expresion comenzando con operador.";
+                string mensaje = "Error: Dos operadores seguidos o expresion comenzando con operador.";
 
-                if(MostrarInterfaz){std::cout << mensaje << std::endl;showAlert(mensaje);}
+                if(MostrarInterfaz){cout << mensaje << endl;showAlert(mensaje);}
                 return false;
             }
             if (c == '/') {
@@ -245,32 +247,32 @@ bool Evaluador::evaluarInfija(const std::string& expresion) {
             ultimoEsOperador = true;
         } else if (c == ')') {
             if (pila.empty() || pila.top() != '(') {
-                std::string mensaje = "Error: Parentesis desbalanceados.";
+                string mensaje = "Error: Parentesis desbalanceados.";
 
-                if(MostrarInterfaz){std::cout << mensaje << std::endl;showAlert(mensaje);}
+                if(MostrarInterfaz){cout << mensaje << endl;showAlert(mensaje);}
                 return false;
             }
             pila.pop();
             ultimoEsOperador = false;
-        } else if (!std::isspace(c)) {
-            std::string mensaje = "Error: Caracter inválido en la expresion.";
+        } else if (!isspace(c)) {
+            string mensaje = "Error: Caracter inválido en la expresion.";
 
-            if(MostrarInterfaz){std::cout << mensaje << std::endl;showAlert(mensaje);}
+            if(MostrarInterfaz){cout << mensaje << endl;showAlert(mensaje);}
             return false;
         }
     }
 
     if (ultimoEsOperador) {
-        std::string mensaje = "Error: La expresion no puede terminar con un operador.";
+        string mensaje = "Error: La expresion no puede terminar con un operador.";
 
-        if(MostrarInterfaz){ std::cout << mensaje << std::endl;showAlert(mensaje);}
+        if(MostrarInterfaz){ cout << mensaje << endl;showAlert(mensaje);}
         return false;
     }
 
     if (!pila.empty()) {
-        std::string mensaje = "Error: Parentesis desbalanceados.";
+        string mensaje = "Error: Parentesis desbalanceados.";
 
-        if(MostrarInterfaz){ std::cout << mensaje << std::endl;showAlert(mensaje);}
+        if(MostrarInterfaz){ cout << mensaje << endl;showAlert(mensaje);}
         return false;
     }
 

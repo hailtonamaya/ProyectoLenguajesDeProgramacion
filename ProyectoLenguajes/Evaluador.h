@@ -9,6 +9,7 @@
 #include <cctype>
 #include <gtk/gtk.h>
 
+using namespace std;
 
 bool esOperador(char c);
 int precedencia(char c);
@@ -18,12 +19,12 @@ public:
     Evaluador( GtkWidget *mainWindow);
     Evaluador( );
 
-    void showAlert(const std::string& message);
-    void imprimirEstado(const std::string& resultado, const std::stack<char>& pila);
-    std::string infijaAPostfija(const std::string& infija);
-    void imprimirEstadoPila(const std::stack<double>& pila);
-    double evaluarPostfija(const std::string& expresion);
-    bool evaluarInfija(const std::string& expresion);
+    void showAlert(const string& message);
+    void imprimirEstado(const string& resultado, const stack<char>& pila);
+    string infijaAPostfija(const string& infija);
+    void imprimirEstadoPila(const stack<double>& pila);
+    double evaluarPostfija(const string& expresion);
+    bool evaluarInfija(const string& expresion);
 
 private:
 

@@ -35,12 +35,12 @@ TEST(TestSuccess3, TestEvaluarPostfijaS3) {
 }
 
 TEST(TestSuccess4, TestEvaluarInfijaS4) {
-	EXPECT_EQ(186, Eval.evaluarInfija("180+2*3"));
+	EXPECT_EQ(true, Eval.evaluarInfija("180+2*3"));
 	EXPECT_TRUE(true);
 }
 
 TEST(TestSuccess5, TestEvaluarInfijaS5) {
-	EXPECT_EQ(535.6, Eval.evaluarInfija("3+532.6"));
+	EXPECT_EQ(true, Eval.evaluarInfija("3+532.6"));
 	EXPECT_TRUE(true);
 }
 

@@ -3376,14 +3376,14 @@
 
 1715117448 /usr/include/gtk-3.0/gtk/gtk-autocleanups.h
 
-1718755052 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.cpp
+1718828894 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.cpp
 	"Evaluador.h"
 	<stack>
 	<sstream>
 	<string>
 	<cctype>
 
-1718753733 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.h
+1718828748 /home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.h
 	<iostream>
 	<stack>
 	<sstream>
@@ -3447,4 +3447,15 @@
 1715027668 /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h
 
 1715027668 /usr/include/x86_64-linux-gnu/bits/siginfo-arch.h
+
+1718818703 source:/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/googleTest/main.cpp
+	<stdlib.h>
+	<gtk/gtk.h>
+	<iostream>
+	<string>
+	<fstream>
+	<sstream>
+	"/home/josue/Documents/GitHub/ProyectoLenguajesDeProgramacion/ProyectoLenguajes/Evaluador.cpp"
+	<gtk/gtk.h>
+	<gtest/gtest.h>
 

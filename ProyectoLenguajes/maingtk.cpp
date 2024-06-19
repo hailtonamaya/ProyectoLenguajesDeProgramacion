@@ -54,15 +54,15 @@ Evaluador Eval(window);
 Constantes constas;
 Variables vars(constas,window);
 
-std::string read_file_content(const std::string& file_path) {
-    std::ifstream file(file_path);
-    std::stringstream buffer;
+string read_file_content(const string& file_path) {
+    ifstream file(file_path);
+    stringstream buffer;
 
     if (file) {
         buffer << file.rdbuf();
         return buffer.str();
     } else {
-        std::cerr << "Error al abrir el archivo: " << file_path << std::endl;
+        cerr << "Error al abrir el archivo: " << file_path << endl;
         return "Error: No se pudo leer el archivo.";
     }
 }
@@ -90,24 +90,24 @@ static void on_button_clicked(GtkButton *button, gpointer My_Widgets) {
     const gchar *entry_text = gtk_entry_get_text(entry);
     const gchar *current_text = gtk_label_get_text(label);
 
-    std::string entry_string(entry_text);
-    //std::string expresionInfija = "3 + 4 * 5";
-    std::cout << "Expresion infija: "<< entry_string << std::endl;
+    string entry_string(entry_text);
+    //string expresionInfija = "3 + 4 * 5";
+    cout << "Expresion infija: "<< entry_string << endl;
 
     double resultado = 0;
     //               expresionInfija
 
-    std::string expresionReemplazadaBase = vars.reemplazarVariables(entry_string);
-      std::string expresionReemplazada = constas.reemplazarConstantes(expresionReemplazadaBase);
+    string expresionReemplazadaBase = vars.reemplazarVariables(entry_string);
+      string expresionReemplazada = constas.reemplazarConstantes(expresionReemplazadaBase);
 
-        std::cout << "Expresion infija (VAR): "<< entry_string << std::endl;
+        cout << "Expresion infija (VAR): "<< entry_string << endl;
 
     if(Eval.evaluarInfija(expresionReemplazada)){
-     std::cout << "Expresion infija evaluada correctamente" << std::endl;
-        std::string expresionPostfija = Eval.infijaAPostfija(expresionReemplazada);
-        std::cout << "Expresion postfija: " << expresionPostfija << std::endl;
+     cout << "Expresion infija evaluada correctamente" << endl;
+        string expresionPostfija = Eval.infijaAPostfija(expresionReemplazada);
+        cout << "Expresion postfija: " << expresionPostfija << endl;
         double resultadoInfija = Eval.evaluarPostfija(expresionPostfija);
-             std::cout << "resultadoInfija: " << resultadoInfija << std::endl;
+             cout << "resultadoInfija: " << resultadoInfija << endl;
         resultado = resultadoInfija;
 
 
@@ -154,7 +154,7 @@ static void on_variables_button_clicked(GtkButton *button, gpointer My_Widgets) 
 
 
     const gchar *entry_text = gtk_entry_get_text(entry);
-    std::string entry_string(entry_text);
+    string entry_string(entry_text);
 
     vars.insertarVariable(entry_string);
     vars.imprimirVariables();
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
 constas.imprimirConstantes();
 
 
-std::string file_content = read_file_content("constantes");
+string file_content = read_file_content("constantes");
 const gchar* label_text = file_content.c_str();
 
 

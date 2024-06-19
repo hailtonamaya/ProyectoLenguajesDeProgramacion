@@ -11,8 +11,10 @@
 #include "Constantes.h"
 #include <gtk/gtk.h>
 
+using namespace std;
+
 struct Variable {
-    std::string nombre;
+    string nombre;
     double valor;
 };
 
@@ -22,7 +24,7 @@ public:
         : constantes(constantesFile), mainWindow(mainWindow) {}
 
 
-    void show_alert(const std::string &message) const {
+    void show_alert(const string &message) const {
         GtkWidget *dialog;
         dialog = gtk_message_dialog_new(GTK_WINDOW(mainWindow),
                                         GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -34,35 +36,35 @@ public:
         gtk_widget_destroy(dialog);
     }
 
-    std::string reemplazarVariables(const std::string &expresion) const {
-        std::string resultado = expresion;
+    string reemplazarVariables(const string &expresion) const {
+        string resultado = expresion;
         for (const auto &var : variables) {
-            std::regex varRegex("\\b" + var.nombre + "\\b");
-            resultado = std::regex_replace(resultado, varRegex, std::to_string(var.valor));
+            regex varRegex("\\b" + var.nombre + "\\b");
+            resultado = regex_replace(resultado, varRegex, to_string(var.valor));
         }
         return resultado;
     }
 
-    void insertarVariable(const std::string &cadena) {
-        std::string linea = cadena;
+    void insertarVariable(const string &cadena) {
+        string linea = cadena;
 
-        linea.erase(std::remove_if(linea.begin(), linea.end(), ::isspace), linea.end());
+        linea.erase(remove_if(linea.begin(), linea.end(), ::isspace), linea.end());
 
-        std::istringstream stream(linea);
-        std::string nombre;
+        istringstream stream(linea);
+        string nombre;
         double valor;
 
-        if (std::getline(stream, nombre, '=') && stream >> valor) {
+        if (getline(stream, nombre, '=') && stream >> valor) {
 
             if (!constantes.validarNombre(nombre)) {
-                std::stringstream ss;
+                stringstream ss;
                 ss << "Error: El nombre '" << nombre << "' está definido como constante y no se puede modificar.";
                 show_alert(ss.str());
                 return;
             }
 
 
-            auto it = std::find_if(variables.begin(), variables.end(),
+            auto it = find_if(variables.begin(), variables.end(),
                                    [&nombre](const Variable &v) { return v.nombre == nombre; });
 
             if (it != variables.end()) {
@@ -74,7 +76,7 @@ public:
                 variables.push_back(var);
             }
         } else {
-            std::stringstream ss;
+            stringstream ss;
             ss << "Formato de cadena incorrecto: " << cadena;
             show_alert(ss.str());
         }
@@ -82,12 +84,12 @@ public:
 
     void imprimirVariables() const {
         for (const auto &var : variables) {
-            std::cout << "Nombre: " << var.nombre << ", Valor: " << var.valor << std::endl;
+            cout << "Nombre: " << var.nombre << ", Valor: " << var.valor << endl;
         }
     }
 
     const char *obtenerCadenaDeVariables() const {
-        std::stringstream ss;
+        stringstream ss;
         for (const auto &var : variables) {
             ss << var.nombre << "=" << var.valor << "\n";
         }
@@ -96,9 +98,9 @@ public:
     }
 
 private:
-    std::vector<Variable> variables;
-    std::unordered_map<std::string, double> variablesMap;
-    mutable std::string cadenaDeVariables;
+    vector<Variable> variables;
+    unordered_map<string, double> variablesMap;
+    mutable string cadenaDeVariables;
 
     Constantes constantes;
     GtkWidget *mainWindow;

@@ -10,8 +10,10 @@
 #include <regex>
 #include <algorithm>
 
+using namespace std;
+
 struct Constante {
-    std::string nombre;
+    string nombre;
     double valor;
 };
 
@@ -20,39 +22,39 @@ public:
     Constantes();
     virtual ~Constantes();
 
-    std::string obtenerCadenaDeConstantes() const;
-    std::string reemplazarConstantes(const std::string &expresion) const;
-    bool validarNombre(const std::string &nombre) const;
+    string obtenerCadenaDeConstantes() const;
+    string reemplazarConstantes(const string &expresion) const;
+    bool validarNombre(const string &nombre) const;
 void imprimirConstantes() const;
 private:
-    std::vector<Constante> constantes;
-    std::unordered_map<std::string, double> constantesMap;
+    vector<Constante> constantes;
+    unordered_map<string, double> constantesMap;
 
-    void leerArchivo(const std::string &filename);
+    void leerArchivo(const string &filename);
 };
 
 Constantes::Constantes() {
 
    try {
         leerArchivo("constantes");
-    } catch (const std::exception &ex) {
-        std::cerr << "Error al inicializar Constantes: " << ex.what() << std::endl;
+    } catch (const exception &ex) {
+        cerr << "Error al inicializar Constantes: " << ex.what() << endl;
 
     }
 }
 
 Constantes::~Constantes() {}
 
-void Constantes::leerArchivo(const std::string &filename) {
-    std::ifstream file(filename);
+void Constantes::leerArchivo(const string &filename) {
+    ifstream file(filename);
     if (!file.is_open()) {
-        throw std::runtime_error("No se pudo abrir el archivo: " + filename);
+        throw runtime_error("No se pudo abrir el archivo: " + filename);
     }
 
-    std::string line;
-    while (std::getline(file, line)) {
+    string line;
+    while (getline(file, line)) {
 
-        line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
+        line.erase(remove_if(line.begin(), line.end(), ::isspace), line.end());
 
         if (line.empty() || line[0] == '#') {
             continue;
@@ -60,21 +62,21 @@ void Constantes::leerArchivo(const std::string &filename) {
 
 
         auto equalPos = line.find('=');
-        if (equalPos == std::string::npos) {
-            std::cerr << "Error de formato en la línea: " << line << std::endl;
+        if (equalPos == string::npos) {
+            cerr << "Error de formato en la línea: " << line << endl;
             continue;
         }
 
-        std::string nombre = line.substr(0, equalPos);
-        std::string valorStr = line.substr(equalPos + 1);
-        double valor = std::stod(valorStr);
+        string nombre = line.substr(0, equalPos);
+        string valorStr = line.substr(equalPos + 1);
+        double valor = stod(valorStr);
 
 
-        auto it = std::find_if(constantes.begin(), constantes.end(),
+        auto it = find_if(constantes.begin(), constantes.end(),
                                [&nombre](const Constante &c) { return c.nombre == nombre; });
 
         if (it != constantes.end()) {
-            std::cerr << "Advertencia: La constante '" << nombre << "' ya está definida." << std::endl;
+            cerr << "Advertencia: La constante '" << nombre << "' ya está definida." << endl;
             continue;
         }
 
@@ -87,25 +89,25 @@ void Constantes::leerArchivo(const std::string &filename) {
     file.close();
 }
 
-std::string Constantes::obtenerCadenaDeConstantes() const {
-    std::stringstream ss;
+string Constantes::obtenerCadenaDeConstantes() const {
+    stringstream ss;
     for (const auto &constante : constantes) {
         ss << constante.nombre << "=" << constante.valor << "\n";
     }
     return ss.str();
 }
 
-std::string Constantes::reemplazarConstantes(const std::string &expresion) const {
-    std::string resultado = expresion;
+string Constantes::reemplazarConstantes(const string &expresion) const {
+    string resultado = expresion;
     for (const auto &constante : constantes) {
-        std::regex constRegex("\\b" + constante.nombre + "\\b");
-        resultado = std::regex_replace(resultado, constRegex, std::to_string(constante.valor));
+        regex constRegex("\\b" + constante.nombre + "\\b");
+        resultado = regex_replace(resultado, constRegex, to_string(constante.valor));
     }
     return resultado;
 }
 
-bool Constantes::validarNombre(const std::string &nombre) const {
-    auto it = std::find_if(constantes.begin(), constantes.end(),
+bool Constantes::validarNombre(const string &nombre) const {
+    auto it = find_if(constantes.begin(), constantes.end(),
                            [&nombre](const Constante &c) { return c.nombre == nombre; });
 
     return it == constantes.end();
@@ -114,7 +116,7 @@ bool Constantes::validarNombre(const std::string &nombre) const {
 
 void Constantes::imprimirConstantes() const {
     for (const auto &constante : constantes) {
-        std::cout << constante.nombre << " = " << constante.valor << std::endl;
+        cout << constante.nombre << " = " << constante.valor << endl;
     }
 }
 
